@@ -1,0 +1,9 @@
+[Unit]
+Description=Starts up the code necessary for the robot
+
+[Service]
+Restart=always
+ExecStart=/home/nfr/note_detection/startup.sh
+
+[Install]
+WantedBy=multi-user.target
