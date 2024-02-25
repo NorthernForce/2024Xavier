@@ -34,7 +34,7 @@ try:
         results = model(frame, conf=.45, verbose=False)[0]
 
         largest_conf = 0
-        current_note_rad = 0
+        current_note_rad = float("nan") # NaN = no note detected
         current_note_x = 0
         current_note_y = 0
         print("Notes Detected:", len(results.boxes))
