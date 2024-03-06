@@ -28,7 +28,6 @@ instance.startClient4("skynet")
 
 try:
     while True:
-        print("=======================")
         ret, frame = video.read()
         
         results = model(frame, conf=.45, verbose=False)[0]
@@ -37,9 +36,7 @@ try:
         current_note_rad = float("nan") # NaN = no note detected
         current_note_x = 0
         current_note_y = 0
-        print("Notes Detected:", len(results.boxes))
         for box in results.boxes:
-            print(box.xywh)
             x, y, w, h = box.xywh[0]
             # inverse tangent of (note_x - principal_point_x) / focal_len_x
             #x_rad = atan((x.item() - 323.4001746867161) / 473.31513614924415)
@@ -56,14 +53,10 @@ try:
                 (int(x-w//2), int(y-h//2)),
                 (int(x+w//2), int(y+h//2)), (0, 255, 0), 8)
             if box.conf.item() > largest_conf:
-                print(f"{box.conf.item()} > {largest_conf}")
                 largest_conf = box.conf.item()
                 current_note_rad = x_rad
                 current_note_x = int(x.item())
                 current_note_y = int(y.item())
-            else:
-                print(f"{box.conf.item()} < {largest_conf}")
-        
         note_rad.set(current_note_rad)
         cv2.drawMarker(
             frame,
