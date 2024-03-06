@@ -3,6 +3,7 @@ from math import atan
 from ultralytics import YOLO
 import cv2
 import ntcore
+import torch
 from cscore import CameraServer
 
 model = YOLO("YOLOv8nNO.pt").to("cuda")
@@ -37,26 +38,26 @@ try:
         current_note_x = 0
         current_note_y = 0
         for box in results.boxes:
-            x, y, w, h = box.xywh[0]
+            x, y, w, h = box.xywh[0].round().type(torch.int16).tolist()
             # inverse tangent of (note_x - principal_point_x) / focal_len_x
             #x_rad = atan((x.item() - 323.4001746867161) / 473.31513614924415)
             #x_rad = atan((x.item() - 260.5461196441517) / 326.2388384431502) #for 640x480 cropped
             #x_rad = atan((x.item() - 326.2388384431502) / 260.5461196441517)
             #x_rad = atan((x.item() - 390.8191794662276) / 652.4776768863004)
-            x_rad = atan((x.item() - 652.4776768863004) / 390.8191794662276)
+            x_rad = atan((x - 652.4776768863004) / 390.8191794662276)
 
             cv2.drawMarker(
                 frame,
-                (int(x.item()), int(y.item())),
+                (x, y),
                 (0, 255, 0), cv2.MARKER_CROSS, 30, 8)
             cv2.rectangle(frame,
-                (int(x-w//2), int(y-h//2)),
-                (int(x+w//2), int(y+h//2)), (0, 255, 0), 8)
+                (x-w//2, y-h//2),
+                (x+w//2, y+h//2), (0, 255, 0), 8)
             if box.conf.item() > largest_conf:
                 largest_conf = box.conf.item()
                 current_note_rad = x_rad
-                current_note_x = int(x.item())
-                current_note_y = int(y.item())
+                current_note_x = x
+                current_note_y = y
         note_rad.set(current_note_rad)
         cv2.drawMarker(
             frame,
