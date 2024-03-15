@@ -33,7 +33,6 @@ try:
         
         results = model(frame, conf=.45, verbose=False)[0]
 
-        largest_conf = 0
         current_note_rad = float("nan") # NaN = no note detected
         current_note_x = 0
         current_note_y = 0
@@ -53,7 +52,9 @@ try:
             cv2.rectangle(frame,
                 (x-w//2, y-h//2),
                 (x+w//2, y+h//2), (0, 255, 0), 8)
-            if box.conf.item() > largest_conf:
+
+            # sort to get closest note to robot (y axis)
+            if y > current_note_y:
                 largest_conf = box.conf.item()
                 current_note_rad = x_rad
                 current_note_x = x
